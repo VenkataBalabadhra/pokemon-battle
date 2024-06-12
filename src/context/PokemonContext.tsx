@@ -3,6 +3,11 @@ import { createContext, ReactNode } from "react";
 export interface Pokemon {
   name: string;
   url: string;
+  sprites: {
+    front_default: string;
+  };
+  move?: { name: string; url: string; } | undefined;
+  movePower?: number | null;
 }
 
 export interface PokemonContextType {

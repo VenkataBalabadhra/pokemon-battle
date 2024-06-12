@@ -9,11 +9,13 @@ const PokemonCard = ({ pokemon }: PokemonCardProps) => {
     return <div>No Pokémon selected</div>;
   }
 
+  const { name, sprites, move, movePower,  } = pokemon;
+
   return (
     <div>
-      <img src="" alt="" />
-      <h2>Pokemon Name</h2>
-      <div>Move Name - Move Power</div>
+      <img src={sprites.front_default} alt={name} />
+      <h2>{name}</h2>
+      <div>{move?.name} - {movePower}</div>
     </div>
   );
 };
