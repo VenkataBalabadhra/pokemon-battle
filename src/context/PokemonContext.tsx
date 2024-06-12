@@ -37,6 +37,8 @@ interface PokemonProviderProps {
   children: ReactNode;
 }
 
+const getRandomNumber = (max: number) => Math.floor(Math.random() * max);
+
 const PokemonContext = createContext<PokemonContextType | undefined>(undefined);
 
 const PokemonProvider = ({ children }: PokemonProviderProps) => {
@@ -62,13 +64,62 @@ const PokemonProvider = ({ children }: PokemonProviderProps) => {
     fetchPokemonList();
   }, []);
 
+  const getRandomPokemons = useCallback((): Pokemon[] => {
+    const randomUniqueNumbers = new Set<number>();
+    while (randomUniqueNumbers.size < 2) {
+      randomUniqueNumbers.add(getRandomNumber(pokemonList.length));
+    }
+    return Array.from(randomUniqueNumbers).map((index) => pokemonList[index]);
+  }, [pokemonList]);
+
+  const fetchPokemonDetails = async (url: string): Promise<Pokemon | null> => {
+    try {
+      const { data } = await axios.get(url);
+      return data;
+    } catch (err) {
+      console.error(err);
+      setError("Failed to fetch Pokémon details");
+      return null;
+    }
+  };
+
   const setupBattle = useCallback(async () => {
     setLoading(true);
     setError(null);
     setBattleLog("");
-    // setup logic goes here
+
+    const [randomPokemonOne, randomPokemonTwo] = getRandomPokemons();
+
+    const [pokemonOneDetails, pokemonTwoDetails] = await Promise.all([
+      fetchPokemonDetails(randomPokemonOne.url),
+      fetchPokemonDetails(randomPokemonTwo.url),
+    ]);
+
+    if (pokemonOneDetails && pokemonTwoDetails) {
+      const pokemonOneMove =
+        pokemonOneDetails.moves[
+          getRandomNumber(pokemonOneDetails.moves.length)
+        ];
+      const pokemonTwoMove =
+        pokemonTwoDetails.moves[
+          getRandomNumber(pokemonTwoDetails.moves.length)
+        ];
+
+      if (pokemonOneMove?.move && pokemonTwoMove?.move) {
+        setPokemonOne({
+          ...pokemonOneDetails,
+          move: pokemonOneMove.move,
+          movePower: null,
+        });
+        setPokemonTwo({
+          ...pokemonTwoDetails,
+          move: pokemonTwoMove.move,
+          movePower: null,
+        });
+      }
+    }
     setLoading(false);
-  }, []);
+  }, [getRandomPokemons]);
 
   useEffect(() => {
     if (pokemonList.length) {
@@ -80,7 +131,37 @@ const PokemonProvider = ({ children }: PokemonProviderProps) => {
     if (!pokemonOne || !pokemonTwo) return;
 
     setLoading(true);
-    // battle logic goes here
+    try {
+      const [{ data: pokemonOneMove }, { data: pokemonTwoMove }] =
+        await Promise.all([
+          axios.get(pokemonOne.move!.url),
+          axios.get(pokemonTwo.move!.url),
+        ]);
+
+      setPokemonOne((prev) => ({
+        ...prev!,
+        movePower: pokemonOneMove.power || 0,
+      }));
+      setPokemonTwo((prev) => ({
+        ...prev!,
+        movePower: pokemonTwoMove.power || 0,
+      }));
+
+      let log = `Draw !!!`;
+      if (pokemonOneMove.power > pokemonTwoMove.power) {
+        log = `${pokemonOne.name} lands a decisive blow with ${
+          pokemonOne.move!.name
+        } knocking out ${pokemonTwo.name} !`;
+      } else if (pokemonTwoMove.power > pokemonOneMove.power) {
+        log = `${pokemonTwo.name} lands a decisive blow with ${
+          pokemonTwo.move!.name
+        } knocking out ${pokemonOne.name} !`;
+      }
+      setBattleLog(log);
+    } catch (error) {
+      console.error(error);
+      setError("Failed to fetch move details");
+    }
     setLoading(false);
   };
 
