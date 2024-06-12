@@ -4,34 +4,45 @@ import {
   PokemonContextType,
 } from "../../context/PokemonContext";
 import PokemonCard from "../PokemonCard/PokemonCard";
+import "./BattleContainer.css";
 
 const BattleContainer = () => {
   const {
     pokemonOne,
     pokemonTwo,
     startBattle,
+    setupBattle,
     battleLog,
     loading,
     error,
   } = useContext(PokemonContext) as PokemonContextType;
 
   const handleButtonClick = () => {
+    if (battleLog || error) {
+      setupBattle();
+    } else {
       startBattle();
+    }
   };
 
   return (
-    <div>
-      <h1>Pokémon Battle</h1>
-      <div>
-        <PokemonCard pokemon={pokemonOne} />
+    <div className="battle-view">
+      <h1 className="title">Pokémon Battle</h1>
+      <div className="cards-container">
+        <PokemonCard pokemon={pokemonOne} flipHorizontally />
         <PokemonCard pokemon={pokemonTwo} />
       </div>
-      {battleLog && <div>{battleLog}</div>}
-      {error && <div>{error}</div>}
-      {loading && <div>Loading..</div>}
-      <button onClick={handleButtonClick}>Start Battle</button>
+      {battleLog && <p className="battle-log">{battleLog}</p>}
+      {error && <p className="error-message">{error}</p>}
+      {loading ? (
+        <div className="spinner"></div>
+      ) : (
+        <button className="battle-button" onClick={handleButtonClick}>
+          {battleLog || error ? "Reset" : "Start Battle"}
+        </button>
+      )}
     </div>
   );
-};
+}
 
 export default BattleContainer;

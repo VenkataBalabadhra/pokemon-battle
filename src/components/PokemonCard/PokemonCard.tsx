@@ -1,21 +1,32 @@
 import { Pokemon } from "../../context/PokemonContext";
+import "./PokemonCard.css";
 
 interface PokemonCardProps {
   pokemon: Pokemon | null;
+  flipHorizontally?: boolean;
 }
 
-const PokemonCard = ({ pokemon }: PokemonCardProps) => {
+const PokemonCard = ({ pokemon, flipHorizontally }: PokemonCardProps) => {
   if (!pokemon) {
-    return <div>No Pokémon selected</div>;
+    return <p>No Pokémon selected</p>;
   }
 
-  const { name, sprites, move, movePower,  } = pokemon;
+  const { name, move, movePower, sprites } = pokemon;
 
   return (
-    <div>
-      <img src={sprites.front_default} alt={name} />
-      <h2>{name}</h2>
-      <div>{move?.name} - {movePower}</div>
+    <div className="pokemon-card">
+      <img
+        className={`pokemon-image ${
+          flipHorizontally ? "flip-horizontally" : ""
+        }`}
+        src={sprites.front_default}
+        alt={name}
+      />
+      <h2 className="pokemon-name">{name}</h2>
+      <p className="pokemon-move">
+        {move ? move.name : "No move selected"}
+        {movePower !== null && ` - ${movePower}`}
+      </p>
     </div>
   );
 };

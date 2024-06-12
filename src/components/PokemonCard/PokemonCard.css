@@ -1,0 +1,31 @@
+.pokemon-card {
+  text-align: center;
+  width: 200px;
+  height: 260px;
+  margin: 10px;
+  padding: 20px;
+  border: 2px solid #fdb71d;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+}
+
+.pokemon-image {
+  width: 150px;
+  height: 150px;
+}
+
+.flip-horizontally {
+  transform: scaleX(-1);
+}
+
+.pokemon-name {
+  font-size: 1.5em;
+  margin: 10px 0;
+  color: #0054a6;
+}
+
+.pokemon-move {
+  font-size: 1.2em;
+  margin: 10px 0;
+  color: #333;
+}

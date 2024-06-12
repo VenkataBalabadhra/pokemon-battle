@@ -86,6 +86,8 @@ const PokemonProvider = ({ children }: PokemonProviderProps) => {
   const setupBattle = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setPokemonOne(null);
+    setPokemonTwo(null);
     setBattleLog("");
 
     const [randomPokemonOne, randomPokemonTwo] = getRandomPokemons();
